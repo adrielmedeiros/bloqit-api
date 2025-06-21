@@ -3,6 +3,8 @@ import { Document } from 'mongoose';
 import { RentStatus, RentSize } from '../../shared/enums';
 
 export type RentDocument = Rent & Document;
+export type RentResponse = RentDocument;
+export type RentsResponse = RentDocument[];
 
 @Schema({ timestamps: true })
 export class Rent {
