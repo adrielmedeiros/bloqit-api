@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { BloqsModule } from './modules/bloqs/bloqs.module';
+import { LockersModule } from './modules/lockers/lockers.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -14,6 +15,7 @@ import configuration from './config/configuration';
     }),
     DatabaseModule,
     BloqsModule,
+    LockersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

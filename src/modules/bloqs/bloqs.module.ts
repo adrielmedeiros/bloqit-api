@@ -8,8 +8,8 @@ import { Bloq, BloqSchema } from './bloq.schema';
     imports: [
         MongooseModule.forFeature([{ name: Bloq.name, schema: BloqSchema }])
     ],
-    controllers: [BloqsController],
-    providers: [BloqsService],
-    exports: [BloqsService], // Export for use in other modules
+    controllers: [ BloqsController ],
+    providers: [ BloqsService ],
+    exports: [ BloqsService ],
 })
 export class BloqsModule {}

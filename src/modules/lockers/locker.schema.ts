@@ -3,6 +3,8 @@ import { Document } from 'mongoose';
 import { LockerStatus } from '../../shared/enums/locker-status.enum';
 
 export type LockerDocument = Locker & Document;
+export type LockerResponse = LockerDocument;
+export type LockersResponse = LockerDocument[];
 
 @Schema({ timestamps: true })
 export class Locker {
