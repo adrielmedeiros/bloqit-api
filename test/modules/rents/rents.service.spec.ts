@@ -36,13 +36,13 @@ describe('RentsService', () => {
     };
 
     beforeEach(async () => {
-        mockRentModel = jest.fn().mockImplementation(() => ({
-        save: jest.fn().mockResolvedValue(mockRent),
-        }));
+            mockRentModel = jest.fn().mockImplementation(() => ({
+                save: jest.fn().mockResolvedValue(mockRent),
+            }));
 
         mockLockerModel = {
-        findOne: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockAvailableLocker) }),
-        findOneAndUpdate: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockAvailableLocker) }),
+            findOne: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockAvailableLocker) }),
+            findOneAndUpdate: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockAvailableLocker) }),
         };
 
         mockRentModel.find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([mockRent]) });
@@ -51,11 +51,11 @@ describe('RentsService', () => {
         mockRentModel.deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ deletedCount: 1 }) });
 
         const module: TestingModule = await Test.createTestingModule({
-        providers: [
-            RentsService,
-            { provide: getModelToken(Rent.name), useValue: mockRentModel },
-            { provide: getModelToken(Locker.name), useValue: mockLockerModel },
-        ],
+            providers: [
+                RentsService,
+                { provide: getModelToken(Rent.name), useValue: mockRentModel },
+                { provide: getModelToken(Locker.name), useValue: mockLockerModel },
+            ]
         }).compile();
 
         service = module.get<RentsService>(RentsService);
@@ -68,9 +68,9 @@ describe('RentsService', () => {
     // Basic CRUD tests
     it('should create a rent with CREATED status', async () => {
         const createDto = {
-        id: 'test-rent-123',
-        weight: 5,
-        size: RentSize.M,
+            id: 'test-rent-123',
+            weight: 5,
+            size: RentSize.M,
         };
 
         const result = await service.create(createDto);
@@ -102,19 +102,17 @@ describe('RentsService', () => {
 
     it('should delete a rent', async () => {
         await service.remove('test-rent-123');
-        // Just verify it doesn't throw
     });
 
-    // Business logic tests
     it('should drop off a rent and assign locker', async () => {
         const rentToUpdate = { ...mockRent, status: RentStatus.CREATED };
         mockRentModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(rentToUpdate) });
         
         const updatedRent = {
-        ...rentToUpdate,
-        lockerId: 'available-locker-123',
-        status: RentStatus.WAITING_PICKUP,
-        droppedOffAt: expect.any(Date),
+            ...rentToUpdate,
+            lockerId: 'available-locker-123',
+            status: RentStatus.WAITING_PICKUP,
+            droppedOffAt: expect.any(Date),
         };
         mockRentModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(updatedRent) });
 
@@ -123,9 +121,9 @@ describe('RentsService', () => {
         expect(result.status).toBe(RentStatus.WAITING_PICKUP);
         expect(result.lockerId).toBe('available-locker-123');
         expect(mockLockerModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { id: 'available-locker-123' },
-        { isOccupied: true },
-        { new: true }
+            { id: 'available-locker-123' },
+            { isOccupied: true, status: LockerStatus.CLOSED },
+            { new: true }
         );
     });
 
@@ -149,9 +147,9 @@ describe('RentsService', () => {
         mockRentModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(rentToPickUp) });
         
         const deliveredRent = {
-        ...rentToPickUp,
-        status: RentStatus.DELIVERED,
-        pickedUpAt: expect.any(Date),
+            ...rentToPickUp,
+            status: RentStatus.DELIVERED,
+            pickedUpAt: expect.any(Date),
         };
         mockRentModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(deliveredRent) });
 
@@ -159,9 +157,9 @@ describe('RentsService', () => {
         
         expect(result.status).toBe(RentStatus.DELIVERED);
         expect(mockLockerModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { id: 'test-locker-123' },
-        { isOccupied: false },
-        { new: true }
+            { id: 'test-locker-123' },
+            { isOccupied: false, status: LockerStatus.OPEN },
+            { new: true }
         );
     });
 

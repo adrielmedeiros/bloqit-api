@@ -91,9 +91,15 @@ describe('RentsController', () => {
     expect(service.pickUp).toHaveBeenCalledWith('test-rent-123');
   });
 
-  it('should find rents by status', async () => {
-    const result = await controller.findByStatus(RentStatus.CREATED);
+  it('should find rents by status using query parameter', async () => {
+    const result = await controller.findAll(RentStatus.CREATED);
     expect(service.findByStatus).toHaveBeenCalledWith(RentStatus.CREATED);
+    expect(result).toEqual([mockRent]);
+  });
+
+  it('should find all rents when no status query parameter', async () => {
+    const result = await controller.findAll();
+    expect(service.findAll).toHaveBeenCalled();
     expect(result).toEqual([mockRent]);
   });
 });

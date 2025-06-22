@@ -1,19 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { LockersService } from '../../../src/modules/lockers/lockers.service';
 import { Locker } from '../../../src/modules/lockers/locker.schema';
+import { Bloq } from '../../../src/modules/bloqs/bloq.schema';
 import { LockerStatus } from '../../../src/shared/enums';
 
 describe('LockersService', () => {
   let service: LockersService;
-  let mockModel: any; // Add this line
+  let mockLockerModel: any;
+  let mockBloqModel: any;
 
   const mockLocker = {
     id: 'test-locker-123',
     bloqId: 'test-bloq-123',
     status: LockerStatus.CLOSED,
     isOccupied: false,
+  };
+
+  const mockBloq = {
+    id: 'test-bloq-123',
+    title: 'Test Bloq',
+    address: 'Test Address',
   };
 
   const mockAvailableLocker = {
@@ -24,20 +32,24 @@ describe('LockersService', () => {
   };
 
   beforeEach(async () => {
-    mockModel = jest.fn().mockImplementation(() => ({
+    mockLockerModel = jest.fn().mockImplementation(() => ({
       save: jest.fn().mockResolvedValue(mockLocker),
     }));
 
-    // Now TypeScript won't complain
-    mockModel.find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([mockLocker]) });
-    mockModel.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockLocker) });
-    mockModel.findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockLocker) });
-    mockModel.deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ deletedCount: 1 }) });
+    mockBloqModel = {
+      findOne: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockBloq) }),
+    };
+
+    mockLockerModel.find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([mockLocker]) });
+    mockLockerModel.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockLocker) });
+    mockLockerModel.findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockLocker) });
+    mockLockerModel.deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ deletedCount: 1 }) });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LockersService,
-        { provide: getModelToken(Locker.name), useValue: mockModel },
+        { provide: getModelToken(Locker.name), useValue: mockLockerModel },
+        { provide: getModelToken(Bloq.name), useValue: mockBloqModel }, // ← Add this
       ],
     }).compile();
 
@@ -48,8 +60,7 @@ describe('LockersService', () => {
     expect(service).toBeDefined();
   });
 
-  // Basic CRUD tests
-  it('should create a locker', async () => {
+  it('should create a locker when bloq exists', async () => {
     const createDto = {
       id: 'test-locker-123',
       bloqId: 'test-bloq-123',
@@ -58,7 +69,22 @@ describe('LockersService', () => {
     };
 
     const result = await service.create(createDto);
+    expect(mockBloqModel.findOne).toHaveBeenCalledWith({ id: 'test-bloq-123' });
     expect(result).toEqual(mockLocker);
+  });
+
+  it('should throw BadRequestException when bloq does not exist', async () => {
+    mockBloqModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+
+    const createDto = {
+      id: 'test-locker-123',
+      bloqId: 'non-existent-bloq',
+      status: LockerStatus.CLOSED,
+      isOccupied: false,
+    };
+
+    await expect(service.create(createDto)).rejects.toThrow(BadRequestException);
+    await expect(service.create(createDto)).rejects.toThrow('Bloq with ID non-existent-bloq not found');
   });
 
   it('should find all lockers', async () => {
@@ -72,7 +98,7 @@ describe('LockersService', () => {
   });
 
   it('should throw NotFoundException when locker not found', async () => {
-    mockModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+    mockLockerModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
     
     await expect(service.findOne('non-existent')).rejects.toThrow(NotFoundException);
   });
@@ -83,21 +109,33 @@ describe('LockersService', () => {
     expect(result).toEqual(mockLocker);
   });
 
+  it('should validate bloq exists when updating bloqId', async () => {
+    const updateDto = { bloqId: 'new-bloq-123' };
+    await service.update('test-locker-123', updateDto);
+    expect(mockBloqModel.findOne).toHaveBeenCalledWith({ id: 'new-bloq-123' });
+  });
+
+  it('should throw BadRequestException when updating with non-existent bloqId', async () => {
+    mockBloqModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+    
+    const updateDto = { bloqId: 'non-existent-bloq' };
+    await expect(service.update('test-locker-123', updateDto)).rejects.toThrow(BadRequestException);
+  });
+
   it('should delete a locker', async () => {
     await service.remove('test-locker-123');
     // Just verify it doesn't throw
   });
 
-  // Business logic tests
   it('should find lockers by bloqId', async () => {
-    mockModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([mockLocker]) });
+    mockLockerModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([mockLocker]) });
 
     const result = await service.findByBloqId('test-bloq-123');
     expect(result).toEqual([mockLocker]);
   });
 
   it('should find available lockers in a bloq', async () => {
-    mockModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([mockAvailableLocker]) });
+    mockLockerModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([mockAvailableLocker]) });
 
     const result = await service.findAvailableInBloq('test-bloq-123');
     expect(result).toEqual([mockAvailableLocker]);
@@ -105,7 +143,7 @@ describe('LockersService', () => {
 
   it('should mark locker as occupied', async () => {
     const occupiedLocker = { ...mockLocker, isOccupied: true };
-    mockModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(occupiedLocker) });
+    mockLockerModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(occupiedLocker) });
 
     const result = await service.markAsOccupied('test-locker-123');
     expect(result.isOccupied).toBe(true);
@@ -113,7 +151,7 @@ describe('LockersService', () => {
 
   it('should mark locker as free', async () => {
     const freeLocker = { ...mockLocker, isOccupied: false };
-    mockModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(freeLocker) });
+    mockLockerModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(freeLocker) });
 
     const result = await service.markAsFree('test-locker-123');
     expect(result.isOccupied).toBe(false);

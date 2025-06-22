@@ -63,7 +63,6 @@ export class RentsController {
         return this.rentsService.remove(id);
     }
 
-    // Business logic endpoints
     @Put(':id/drop-off')
     dropOff(
         @Param('id') id: string,
@@ -77,13 +76,5 @@ export class RentsController {
         @Param('id') id: string
     ) {
         return this.rentsService.pickUp(id);
-    }
-
-    // For compatibility with tests that expect this method
-    // TODO: Is this method necessary? If not, remove it.
-    findByStatus(
-        status: RentStatus
-    ) {
-        return this.rentsService.findByStatus(status);
     }
 }
