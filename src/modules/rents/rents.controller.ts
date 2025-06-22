@@ -11,12 +11,23 @@ import {
     HttpCode,
     HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { RentsService } from './rents.service';
 import { CreateRentDto } from './dto/create-rent.dto';
 import { UpdateRentDto } from './dto/update-rent.dto';
 import { DropOffRentDto } from './dto/drop-off-rent.dto';
 import { RentStatus } from '../../shared/enums';
+import {
+    ApiCreateRent,
+    ApiFindAllRents,
+    ApiFindOneRent,
+    ApiUpdateRent,
+    ApiDeleteRent,
+    ApiDropOffRent,
+    ApiPickUpRent,
+} from '../../shared/decorators/rents.decorators';
 
+@ApiTags('rents')
 @Controller('rents')
 export class RentsController {
     constructor(
@@ -24,6 +35,7 @@ export class RentsController {
     ) {}
 
     @Post()
+    @ApiCreateRent()
     create(
         @Body() createRentDto: CreateRentDto
     ) {
@@ -31,6 +43,7 @@ export class RentsController {
     }
 
     @Get()
+    @ApiFindAllRents()
     findAll(
         @Query('status') status?: RentStatus
     ) {
@@ -41,6 +54,7 @@ export class RentsController {
     }
 
     @Get(':id')
+    @ApiFindOneRent()
     findOne(
         @Param('id') id: string
     ) {
@@ -48,6 +62,7 @@ export class RentsController {
     }
 
     @Patch(':id')
+    @ApiUpdateRent()
     update(
         @Param('id') id: string,
         @Body() updateRentDto: UpdateRentDto
@@ -56,6 +71,7 @@ export class RentsController {
     }
 
     @Delete(':id')
+    @ApiDeleteRent()
     @HttpCode(HttpStatus.NO_CONTENT)
     remove(
         @Param('id') id: string
@@ -64,6 +80,7 @@ export class RentsController {
     }
 
     @Put(':id/drop-off')
+    @ApiDropOffRent()
     dropOff(
         @Param('id') id: string,
         @Body() dropOffDto: DropOffRentDto
@@ -72,6 +89,7 @@ export class RentsController {
     }
 
     @Put(':id/pick-up')
+    @ApiPickUpRent()
     pickUp(
         @Param('id') id: string
     ) {

@@ -9,10 +9,19 @@ import {
     HttpCode,
     HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { BloqsService } from './bloqs.service';
 import { CreateBloqDto } from './dto/create-bloq.dto';
 import { UpdateBloqDto } from './dto/update-bloq.dto';
+import {
+  ApiCreateBloq,
+  ApiFindAllBloqs,
+  ApiFindOneBloq,
+  ApiUpdateBloq,
+  ApiDeleteBloq,
+} from '../../shared/decorators/bloqs.decorators';
 
+@ApiTags('bloqs')
 @Controller('bloqs')
 export class BloqsController {
     constructor(
@@ -20,6 +29,7 @@ export class BloqsController {
     ) {}
 
     @Post()
+    @ApiCreateBloq()
     create(
         @Body() createBloqDto: CreateBloqDto
     ) {
@@ -27,11 +37,13 @@ export class BloqsController {
     }
 
     @Get()
+    @ApiFindAllBloqs()
     findAll() {
         return this.bloqsService.findAll();
     }
 
     @Get(':id')
+    @ApiFindOneBloq()
     findOne(
         @Param('id') id: string
     ) {
@@ -39,6 +51,7 @@ export class BloqsController {
     }
 
     @Patch(':id')
+    @ApiUpdateBloq()
     update(
         @Param('id') id: string,
         @Body() updateBloqDto: UpdateBloqDto
@@ -47,6 +60,7 @@ export class BloqsController {
     }
 
     @Delete(':id')
+    @ApiDeleteBloq()
     @HttpCode(HttpStatus.NO_CONTENT)
     remove(
         @Param('id') id: string

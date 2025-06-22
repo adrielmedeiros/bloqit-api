@@ -9,10 +9,21 @@ import {
     HttpCode,
     HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { LockersService } from './lockers.service';
 import { CreateLockerDto } from './dto/create-locker.dto';
 import { UpdateLockerDto } from './dto/update-locker.dto';
+import {
+    ApiCreateLocker,
+    ApiFindAllLockers,
+    ApiFindOneLocker,
+    ApiUpdateLocker,
+    ApiDeleteLocker,
+    ApiGetLockersByBloq,
+    ApiGetAvailableLockers,
+} from '../../shared/decorators/lockers.decorators';
 
+@ApiTags('lockers')
 @Controller('lockers')
 export class LockersController {
     constructor(
@@ -20,6 +31,7 @@ export class LockersController {
     ) {}
 
     @Post()
+    @ApiCreateLocker()
     create(
         @Body() createLockerDto: CreateLockerDto
     ) {
@@ -27,11 +39,13 @@ export class LockersController {
     }
 
     @Get()
+    @ApiFindAllLockers()
     findAll() {
         return this.lockersService.findAll();
     }
 
     @Get(':id')
+    @ApiFindOneLocker()
     findOne(
         @Param('id') id: string
     ) {
@@ -39,6 +53,7 @@ export class LockersController {
     }
 
     @Patch(':id')
+    @ApiUpdateLocker()
     update(
         @Param('id') id: string,
         @Body() updateLockerDto: UpdateLockerDto
@@ -47,6 +62,7 @@ export class LockersController {
     }
 
     @Delete(':id')
+    @ApiDeleteLocker()
     @HttpCode(HttpStatus.NO_CONTENT)
     remove(
         @Param('id') id: string
@@ -54,8 +70,8 @@ export class LockersController {
         return this.lockersService.remove(id);
     }
 
-    // Business logic endpoints
     @Get('bloq/:bloqId')
+    @ApiGetLockersByBloq()
     findByBloq(
         @Param('bloqId') bloqId: string
     ) {
@@ -63,6 +79,7 @@ export class LockersController {
     }
 
     @Get('bloq/:bloqId/available')
+    @ApiGetAvailableLockers()
     findAvailableInBloq(
         @Param('bloqId') bloqId: string
     ) {

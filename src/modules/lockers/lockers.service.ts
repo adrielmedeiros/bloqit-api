@@ -16,7 +16,6 @@ export class LockersService {
     async create(
         createLockerDto: CreateLockerDto
     ): Promise<LockerResponse> {
-        // Can only create a locker for a bloq that exists
         const bloq = await this.bloqModel.findOne({ id: createLockerDto.bloqId }).exec();
         if (!bloq) {
             throw new BadRequestException(`Bloq with ID ${createLockerDto.bloqId} not found`);
