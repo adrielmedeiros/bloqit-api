@@ -1,112 +1,86 @@
-# Software Engineering Challenge, by Bloqit
+# Bloqit API
 
-Yesterday morning, when we showed up to work at 9ish, we noticed that all our codebases suddenly **disappeared** (yes, including the "serverless" stuff) and, to make matters worse, all our staff had a strong and collective case of amnesia (which, funny enough, only extends to the work-related subjects). Our CTO, though, still has some flashes of our domain model. He vaguely remembers that we had a thing called `Bloq`, which each contained many `Lockers` (doors), which, in turn, could contain a thing called `Rent` (parcel) from time to time. After this short description, our engineering team also started to have some memory flashes and managed to put together some basic properties of each entity:
+A REST API for managing delivery lockers. Built with NestJS and MongoDB.
 
-```graphql
-enum RentStatus {
-  CREATED
-  WAITING_DROPOFF
-  WAITING_PICKUP
-  DELIVERED
-}
+## 🎯 What it does
 
-enum RentSize {
-  XS
-  S
-  M
-  L
-  XL
-}
+This API manages three main things:
+- **Bloqs**: Locations with multiple lockers
+- **Lockers**: Individual storage compartments  
+- **Rents**: Package delivery requests
 
-type Rent {
-  id: String
-  lockerId: string
-  weight: number
-  size: RentSize
-  status: RentStatus
-}
+The basic workflow: create a rent → drop off package (assigns locker) → pick up package (frees locker).
 
-enum LockerStatus {
-  OPEN
-  CLOSED
-}
+## 🏗️ Tech Stack
 
-type Locker {
-  id: String
-  bloqId: String
-  status: LockerStatus
-  isOccupied: bool
-}
+- **Framework**: NestJS (Node.js)
+- **Database**: MongoDB with Mongoose ODM
+- **Testing**: Jest
+- **Validation**: class-validator
+- **Documentation**: Swagger/OpenAPI (auto-generated)
+- **API Testing**: Integrated Swagger UI
 
-type Bloq {
-  id: String
-  title: String
-  address: String
-}
+## 🚀 Quick start
+
+```bash
+# Install and start
+npm install
+npm run start:dev
 ```
 
-The engineering team also found it useful to capture the aforementioned relationships into an entity-relationship diagram, resulting in the depiction below:
+The API runs on `http://localhost:3000`. Visit `/api` for interactive Swagger documentation.
 
-```mermaid
-erDiagram
-    BLOQ ||--|{ LOCKER : has_many
-    LOCKER ||--|{ RENT : may_contain
-    BLOQ {
-        string id
-        string title
-        string address
-    }
-    LOCKER {
-        string id
-        string bloqId
-        string status
-        bool isOccupied
-    }
-    RENT {
-        string id
-        string lockerId
-        number weight
-        string size
-        Date createdAt
-        Date droppedOffAt
-        Date pickedUpAt
-    }
+The database seeds automatically with sample data when you start the app.
+
+## 📚 API endpoints
+
+```
+# Bloqs
+GET/POST /bloqs
+GET/PATCH/DELETE /bloqs/:id
+
+# Lockers  
+GET/POST /lockers
+GET/PATCH/DELETE /lockers/:id
+GET /lockers/bloq/:bloqId/available
+
+# Rents
+GET/POST /rents
+GET/PATCH/DELETE /rents/:id
+POST /rents/:id/dropoff
+POST /rents/:id/pickup
 ```
 
+## 📋 Business rules
 
+- OPEN lockers can't be occupied
+- Only CREATED rents can be dropped off
+- Only WAITING_PICKUP rents can be picked up
+- IDs are auto-generated UUIDs if not provided
 
-When they headed off to start coding this all over again, though, they realized that **they can't code!!!**. Thankfully we have you, dear candidate, to implement our API from scratch all over again 🙌🏽
+**Drop-off**: Finds available locker, marks it as CLOSED+occupied, sets rent to WAITING_PICKUP
 
-Remember: Bloqit is a company that builds software to assist first, middle, and last-mile deliveries. Therefore, our main goal with the aforementioned API is to allow our consumers to deposit (drop-off) and retrieve (pick-up) parcels from a compartment (locker / door), so keep it in mind when implementing the code.
+**Pick-up**: Frees the locker (OPEN+not occupied), sets rent to DELIVERED
 
-## The challenge
+## 🧪 Testing
 
-Based on the description above, you're now tasked to implement an initial version of our API, containing the three aforementioned entities represented as API resources. We count on you to help us come back on facilitating first, middle, and last mile delivery as soon as possible!
+```bash
+npm run test
+npm run test:cov
+```
 
-Ah, before we forget (again), we've also found some JSON files that seem to be from collections related to the entities mentioned above, please use that as our database (they're located at [/data](./data)).
+Tests cover all services and controllers. Check the `test/` directory for the full test suite.
 
-## What we will be analyzing
+## 📁 Project structure
 
-**Code cohesion, quality, clearness, and correctness**
+```
+src/
+├── modules/
+│   ├── bloqs/           # Bloq management
+│   ├── lockers/         # Locker management
+│   └── rents/           # Rent management
+├── shared/enums/        # Status types
+└── database/            # Seeding and config
+```
 
-We value clean code that works and that follows industry-wide standards. Be ready to bring your best programming skills to the table.
-
-**Test coverage**
-
-The "that works" part in the topic above cannot be expressed with 100% certainty unless we have good test coverage. Feel free to include some while implementing your solution.
-
-**Codebase organization, modularization, and coupling**
-
-In such a dynamic and fast-paced environment like ours, we always keep an eye out for scalability and also for eventual strategic swings and changes of priority in our product offerings. In a scenario like that, good modularization and low coupling are two critical aspects that allow us to move fast without breaking things.
-
-**Engineering principles and practices**
-
-Sometimes it's good to know the theoretical principles behind certain practices, feel free to bring some of the patterns you may judge necessary when implementing the solution.
-
-## Time limits
-
-The recommended time to implement this challenge is two days. We're aware, though, that several aspects may impact your velocity, such as time dedicated per day, programming experience, and so on. Feel free to dedicate as much effort to it as you find relevant, but bear in mind that a fixed deadline may be provided at the moment we provide you with this challenge.
-
-## Programming language, tech stack, etc
-
-Unless told otherwise, feel free to use your favorite programming language and tech stack to implement this challenge.
+That's it. Check `/api` for detailed endpoint documentation.
