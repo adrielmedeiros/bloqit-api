@@ -36,17 +36,21 @@ describe('RentsService', () => {
     };
 
     beforeEach(async () => {
-            mockRentModel = jest.fn().mockImplementation(() => ({
-                save: jest.fn().mockResolvedValue(mockRent),
-            }));
+        mockRentModel = jest.fn().mockImplementation(() => ({
+            save: jest.fn().mockResolvedValue(mockRent),
+        }));
 
         mockLockerModel = {
-            findOne: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockAvailableLocker) }),
-            findOneAndUpdate: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockAvailableLocker) }),
+            findOne: jest.fn().mockReturnValue({
+                exec: jest.fn().mockResolvedValue(mockAvailableLocker)
+            }),
+            findOneAndUpdate: jest.fn().mockReturnValue({
+                exec: jest.fn().mockResolvedValue(mockAvailableLocker)
+            }),
         };
 
         mockRentModel.find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([mockRent]) });
-        mockRentModel.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockRent) });
+        mockRentModel.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
         mockRentModel.findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockRent) });
         mockRentModel.deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ deletedCount: 1 }) });
 
@@ -59,6 +63,10 @@ describe('RentsService', () => {
         }).compile();
 
         service = module.get<RentsService>(RentsService);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     it('should be defined', () => {
@@ -84,6 +92,8 @@ describe('RentsService', () => {
     });
 
     it('should find one rent', async () => {
+        mockRentModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(mockRent) });
+        
         const result = await service.findOne('test-rent-123');
         expect(result).toEqual(mockRent);
     });
@@ -95,6 +105,8 @@ describe('RentsService', () => {
     });
 
     it('should update a rent', async () => {
+        mockRentModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(mockRent) });
+
         const updateDto = { weight: 7 };
         const result = await service.update('test-rent-123', updateDto);
         expect(result).toEqual(mockRent);
@@ -128,8 +140,13 @@ describe('RentsService', () => {
     });
 
     it('should throw BadRequestException when dropping off non-CREATED rent', async () => {
-        const rentInProgress = { ...mockRent, status: RentStatus.WAITING_PICKUP };
-        mockRentModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(rentInProgress) });
+        const rentInProgress = {
+            ...mockRent,
+            status: RentStatus.WAITING_PICKUP
+        };
+        mockRentModel.findOne.mockReturnValue({
+            exec: jest.fn().mockResolvedValue(rentInProgress)
+        });
 
         await expect(service.dropOff('test-rent-123', 'test-bloq-123')).rejects.toThrow(BadRequestException);
     });
@@ -143,15 +160,22 @@ describe('RentsService', () => {
     });
 
     it('should pick up a rent and free locker', async () => {
-        const rentToPickUp = { ...mockRentWithLocker, status: RentStatus.WAITING_PICKUP };
-        mockRentModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(rentToPickUp) });
+        const rentToPickUp = {
+            ...mockRentWithLocker,
+            status: RentStatus.WAITING_PICKUP
+        };
+        mockRentModel.findOne.mockReturnValue({
+            exec: jest.fn().mockResolvedValue(rentToPickUp)
+        });
         
         const deliveredRent = {
             ...rentToPickUp,
             status: RentStatus.DELIVERED,
             pickedUpAt: expect.any(Date),
         };
-        mockRentModel.findOneAndUpdate.mockReturnValue({ exec: jest.fn().mockResolvedValue(deliveredRent) });
+        mockRentModel.findOneAndUpdate.mockReturnValue({
+            exec: jest.fn().mockResolvedValue(deliveredRent)
+        });
 
         const result = await service.pickUp('test-rent-456');
         

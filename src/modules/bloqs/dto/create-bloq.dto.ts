@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateBloqDto {
     @IsUUID()
-    @IsNotEmpty()
-    id: string;
+    @IsOptional()
+    id?: string;
 
     @IsString()
     @IsNotEmpty()

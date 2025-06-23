@@ -1,10 +1,10 @@
-import { IsNotEmpty, IsUUID, IsEnum, IsNumber, IsPositive } from 'class-validator';
+import { IsNotEmpty, IsUUID, IsEnum, IsNumber, IsPositive, IsOptional } from 'class-validator';
 import { RentSize } from '../../../shared/enums/rent-size.enum';
 
 export class CreateRentDto {
+    @IsOptional()
     @IsUUID()
-    @IsNotEmpty()
-    id: string;
+    id?: string;
 
     @IsNumber()
     @IsPositive()

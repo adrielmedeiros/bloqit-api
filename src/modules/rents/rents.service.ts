@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { randomUUID } from 'crypto';
 import { Rent, RentDocument, RentResponse, RentsResponse } from './rent.schema';
 import { Locker, LockerDocument } from '../lockers/locker.schema';
 import { CreateRentDto } from './dto/create-rent.dto';
@@ -17,8 +18,16 @@ export class RentsService {
     async create(
         createRentDto: CreateRentDto
     ): Promise<RentResponse> {
+        const rentId = createRentDto.id || randomUUID();
+        
+        const existingRent = await this.rentModel.findOne({ id: rentId }).exec();
+        if (existingRent) {
+            throw new BadRequestException(`Rent with ID ${rentId} already exists`);
+        }
+
         const rent = new this.rentModel({
             ...createRentDto,
+            id: rentId,
             status: RentStatus.CREATED,
             lockerId: null,
         });

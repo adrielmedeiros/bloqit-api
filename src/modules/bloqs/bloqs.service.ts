@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { randomUUID } from 'crypto';
 import { Bloq, BloqDocument } from './bloq.schema';
 import { CreateBloqDto } from './dto/create-bloq.dto';
 import { UpdateBloqDto } from './dto/update-bloq.dto';
@@ -12,7 +13,19 @@ export class BloqsService {
     ) {}
 
     async create(createBloqDto: CreateBloqDto): Promise<BloqDocument> {
-        const bloq = new this.bloqModel(createBloqDto);
+        const bloqId = createBloqDto.id || randomUUID();
+        
+        const existingBloq = await this.bloqModel.findOne({ id: bloqId }).exec();
+        if (existingBloq) {
+            throw new BadRequestException(`Bloq with ID ${bloqId} already exists`);
+        }
+
+        const bloqData = {
+            ...createBloqDto,
+            id: bloqId
+        };
+        
+        const bloq = new this.bloqModel(bloqData);
         return bloq.save();
     }
 

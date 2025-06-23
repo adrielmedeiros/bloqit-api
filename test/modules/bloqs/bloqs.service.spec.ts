@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { BloqsService } from '../../../src/modules/bloqs/bloqs.service';
 import { Bloq } from '../../../src/modules/bloqs/bloq.schema';
 
@@ -22,7 +22,7 @@ describe('BloqsService', () => {
     }));
     
     mockModel.find = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue([mockBloq]) });
-    mockModel.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockBloq) });
+    mockModel.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
     mockModel.findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(mockBloq) });
     mockModel.deleteOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({ deletedCount: 1 }) });
 
@@ -53,8 +53,47 @@ describe('BloqsService', () => {
 
     const result = await service.create(createDto);
     
+    expect(mockModel.findOne).toHaveBeenCalledWith({ id: 'test-id-123' });
     expect(mockModel).toHaveBeenCalledWith(createDto);
     expect(result).toEqual(mockBloq);
+  });
+
+  it('should create a bloq with generated ID when ID not provided', async () => {
+    const createDto = {
+      // id not provided - should be generated
+      title: 'Test Bloq',
+      address: 'Test Address',
+    };
+
+    const result = await service.create(createDto);
+    
+    // Verify the constructor was called with generated ID
+    const constructorCall = mockModel.mock.calls[0][0];
+    expect(constructorCall).toMatchObject({
+      title: 'Test Bloq',
+      address: 'Test Address',
+    });
+    
+    // Verify an ID was generated
+    expect(constructorCall.id).toBeDefined();
+    expect(typeof constructorCall.id).toBe('string');
+    expect(constructorCall.id.length).toBeGreaterThan(0);
+    
+    expect(result).toEqual(mockBloq);
+  });
+
+  it('should throw BadRequestException when bloq ID already exists', async () => {
+    // Override to return existing bloq
+    mockModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(mockBloq) });
+
+    const createDto = {
+      id: 'existing-bloq-123',
+      title: 'Test Bloq',
+      address: 'Test Address',
+    };
+
+    await expect(service.create(createDto)).rejects.toThrow(BadRequestException);
+    await expect(service.create(createDto)).rejects.toThrow('Bloq with ID existing-bloq-123 already exists');
   });
 
   it('should find all bloqs', async () => {
@@ -64,14 +103,14 @@ describe('BloqsService', () => {
   });
 
   it('should find one bloq', async () => {
+    mockModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(mockBloq) });
+
     const result = await service.findOne('test-id-123');
     expect(mockModel.findOne).toHaveBeenCalledWith({ id: 'test-id-123' });
     expect(result).toEqual(mockBloq);
   });
 
   it('should throw NotFoundException when bloq not found', async () => {
-    mockModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
-    
     await expect(service.findOne('non-existent')).rejects.toThrow(NotFoundException);
   });
 
