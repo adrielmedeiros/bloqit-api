@@ -1,0 +1,489 @@
+{
+	"info": {
+		"_postman_id": "baf0f35a-e6d8-4ff7-90e6-778cfb85dae2",
+		"name": "Bloqit",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16680858"
+	},
+	"item": [
+		{
+			"name": "Bloqs",
+			"item": [
+				{
+					"name": "Create Bloq",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{$randomUUID}}\",\r\n    \"title\": \"Test bloq title 3\",\r\n    \"address\": \"Test street 3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/bloqs",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"bloqs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Bloq",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"address\": \"Test street UPDATED\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/bloqs/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"bloqs",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "578ac714-b561-4a58-8334-e32fb4a877aa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find All Bloqs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/bloqs",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"bloqs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find One Bloq",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/bloqs/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"bloqs",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "578ac714-b561-4a58-8334-e32fb4a877aa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Bloq",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/bloqs/:id",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"bloqs",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lockers",
+			"item": [
+				{
+					"name": "Create Locker",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{$randomUUID}}\",\r\n    \"bloqId\": \"578ac714-b561-4a58-8334-e32fb4a877aa\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/lockers",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"lockers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Locker NO SUCH BLOQID",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{$randomUUID}}\",\r\n    \"bloqId\": \"{{$randomUUID}}\",\r\n    \"status\": \"OPEN\",\r\n    \"isOccupied\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/lockers",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"lockers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find All Lockers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/lockers",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"lockers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find One Locker",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/lockers/:id",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"lockers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "05f89847-54e2-4493-8f38-ffe543f1d06e"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find By BloqId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/lockers/bloq/:id",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"lockers",
+								"bloq",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "c3ee858c-f3d8-45a3-803d-e080649bbb6f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Available By BloqId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/lockers/bloq/:id/available",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"lockers",
+								"bloq",
+								":id",
+								"available"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "c3ee858c-f3d8-45a3-803d-e080649bbb6f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Locker",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{$randomUUID}}\",\r\n    \"status\": \"CLOSED\",\r\n    \"isOccupied\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/lockers/:id",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"lockers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "a1afca40-0e89-4dd6-8440-891344b30a61"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rents",
+			"item": [
+				{
+					"name": "Find All Rents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/rents?status=CREATED",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"rents"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "CREATED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Rent",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{$randomUUID}}\",\r\n    \"weight\": 7,\r\n    \"size\": \"L\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/rents",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"rents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Drop-off Rent",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"bloqId\": \"5316fb0f-8cd5-49ff-aae3-0a7b7fd763fa\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/rents/:id/drop-off",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"rents",
+								":id",
+								"drop-off"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "654f7a20-29dc-48e3-8eb7-650b1963c59e"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pick-up Rent",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/rents/:id/pick-up",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"rents",
+								":id",
+								"pick-up"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "8ed81dee-2972-4f38-ae70-c66faf46c5e5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find One Rent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}:{{PORT}}/rents/:id",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"rents",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

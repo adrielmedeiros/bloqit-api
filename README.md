@@ -30,6 +30,8 @@ The API runs on `http://localhost:8080`. Visit `/api` for interactive Swagger do
 
 The database seeds automatically with sample data when you start the app.
 
+**Postman Collection**: Import `Bloqit.postman_collection.json` for ready-to-use API requests with environment variables.
+
 ## 📚 API endpoints
 
 ```
