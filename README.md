@@ -16,9 +16,7 @@ The basic workflow: create a rent → drop off package (assigns locker) → pick
 - **Framework**: NestJS (Node.js)
 - **Database**: MongoDB with Mongoose ODM
 - **Testing**: Jest
-- **Validation**: class-validator
-- **Documentation**: Swagger/OpenAPI (auto-generated)
-- **API Testing**: Integrated Swagger UI
+- **Documentation**: Swagger/OpenAPI
 
 ## 🚀 Quick start
 
@@ -28,7 +26,7 @@ npm install
 npm run start:dev
 ```
 
-The API runs on `http://localhost:3000`. Visit `/api` for interactive Swagger documentation.
+The API runs on `http://localhost:8080`. Visit `/api` for interactive Swagger documentation.
 
 The database seeds automatically with sample data when you start the app.
 
@@ -58,9 +56,9 @@ POST /rents/:id/pickup
 - Only WAITING_PICKUP rents can be picked up
 - IDs are auto-generated UUIDs if not provided
 
-**Drop-off**: Finds available locker, marks it as CLOSED+occupied, sets rent to WAITING_PICKUP
+**Drop-off**: Finds available locker, marks it as closed and as occupied, sets rent to WAITING_PICKUP
 
-**Pick-up**: Frees the locker (OPEN+not occupied), sets rent to DELIVERED
+**Pick-up**: Frees the locker (open and not occupied), sets rent to DELIVERED
 
 ## 🧪 Testing
 
