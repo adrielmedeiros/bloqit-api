@@ -1,19 +1,20 @@
-import { IsNotEmpty, IsUUID, IsEnum, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsUUID, IsEnum, IsBoolean, IsOptional } from 'class-validator';
 import { LockerStatus } from '../../../shared/enums/locker-status.enum';
 
 export class CreateLockerDto {
   @IsUUID()
-  @IsNotEmpty()
-  id: string;
+  @IsOptional()
+  id?: string;
 
   @IsUUID()
   @IsNotEmpty()
   bloqId: string;
 
+  @IsOptional()
   @IsEnum(LockerStatus)
-  @IsNotEmpty()
-  status: LockerStatus;
+  status?: LockerStatus;
 
+  @IsOptional()
   @IsBoolean()
-  isOccupied: boolean;
+  isOccupied?: boolean;
 }

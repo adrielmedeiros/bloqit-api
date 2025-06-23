@@ -1,98 +1,112 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Software Engineering Challenge, by Bloqit
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Yesterday morning, when we showed up to work at 9ish, we noticed that all our codebases suddenly **disappeared** (yes, including the "serverless" stuff) and, to make matters worse, all our staff had a strong and collective case of amnesia (which, funny enough, only extends to the work-related subjects). Our CTO, though, still has some flashes of our domain model. He vaguely remembers that we had a thing called `Bloq`, which each contained many `Lockers` (doors), which, in turn, could contain a thing called `Rent` (parcel) from time to time. After this short description, our engineering team also started to have some memory flashes and managed to put together some basic properties of each entity:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+```graphql
+enum RentStatus {
+  CREATED
+  WAITING_DROPOFF
+  WAITING_PICKUP
+  DELIVERED
+}
 
-## Description
+enum RentSize {
+  XS
+  S
+  M
+  L
+  XL
+}
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+type Rent {
+  id: String
+  lockerId: string
+  weight: number
+  size: RentSize
+  status: RentStatus
+}
 
-## Project setup
+enum LockerStatus {
+  OPEN
+  CLOSED
+}
 
-```bash
-$ npm install
+type Locker {
+  id: String
+  bloqId: String
+  status: LockerStatus
+  isOccupied: bool
+}
+
+type Bloq {
+  id: String
+  title: String
+  address: String
+}
 ```
 
-## Compile and run the project
+The engineering team also found it useful to capture the aforementioned relationships into an entity-relationship diagram, resulting in the depiction below:
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```mermaid
+erDiagram
+    BLOQ ||--|{ LOCKER : has_many
+    LOCKER ||--|{ RENT : may_contain
+    BLOQ {
+        string id
+        string title
+        string address
+    }
+    LOCKER {
+        string id
+        string bloqId
+        string status
+        bool isOccupied
+    }
+    RENT {
+        string id
+        string lockerId
+        number weight
+        string size
+        Date createdAt
+        Date droppedOffAt
+        Date pickedUpAt
+    }
 ```
 
-## Run tests
 
-```bash
-# unit tests
-$ npm run test
 
-# e2e tests
-$ npm run test:e2e
+When they headed off to start coding this all over again, though, they realized that **they can't code!!!**. Thankfully we have you, dear candidate, to implement our API from scratch all over again 🙌🏽
 
-# test coverage
-$ npm run test:cov
-```
+Remember: Bloqit is a company that builds software to assist first, middle, and last-mile deliveries. Therefore, our main goal with the aforementioned API is to allow our consumers to deposit (drop-off) and retrieve (pick-up) parcels from a compartment (locker / door), so keep it in mind when implementing the code.
 
-## Deployment
+## The challenge
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Based on the description above, you're now tasked to implement an initial version of our API, containing the three aforementioned entities represented as API resources. We count on you to help us come back on facilitating first, middle, and last mile delivery as soon as possible!
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Ah, before we forget (again), we've also found some JSON files that seem to be from collections related to the entities mentioned above, please use that as our database (they're located at [/data](./data)).
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+## What we will be analyzing
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**Code cohesion, quality, clearness, and correctness**
 
-## Resources
+We value clean code that works and that follows industry-wide standards. Be ready to bring your best programming skills to the table.
 
-Check out a few resources that may come in handy when working with NestJS:
+**Test coverage**
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+The "that works" part in the topic above cannot be expressed with 100% certainty unless we have good test coverage. Feel free to include some while implementing your solution.
 
-## Support
+**Codebase organization, modularization, and coupling**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+In such a dynamic and fast-paced environment like ours, we always keep an eye out for scalability and also for eventual strategic swings and changes of priority in our product offerings. In a scenario like that, good modularization and low coupling are two critical aspects that allow us to move fast without breaking things.
 
-## Stay in touch
+**Engineering principles and practices**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Sometimes it's good to know the theoretical principles behind certain practices, feel free to bring some of the patterns you may judge necessary when implementing the solution.
 
-## License
+## Time limits
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+The recommended time to implement this challenge is two days. We're aware, though, that several aspects may impact your velocity, such as time dedicated per day, programming experience, and so on. Feel free to dedicate as much effort to it as you find relevant, but bear in mind that a fixed deadline may be provided at the moment we provide you with this challenge.
+
+## Programming language, tech stack, etc
+
+Unless told otherwise, feel free to use your favorite programming language and tech stack to implement this challenge.

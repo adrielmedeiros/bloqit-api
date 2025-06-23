@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LockersController } from '../../../src/modules/lockers/lockers.controller';
-import { LockersService } from '../../../src/modules/lockers/lockers.service';
 import { LockerStatus } from '../../../src/shared/enums';
+import { LockersService } from '../../../src/modules/lockers/lockers.service';
+import { LockersController } from '../../../src/modules/lockers/lockers.controller';
 
 describe('LockersController', () => {
   let controller: LockersController;
