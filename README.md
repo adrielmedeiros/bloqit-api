@@ -77,7 +77,9 @@ src/
 │   ├── bloqs/           # Bloq management
 │   ├── lockers/         # Locker management
 │   └── rents/           # Rent management
-├── shared/enums/        # Status types
+├── shared/
+│   ├── enums/           # Status types
+│   └── decorators/      # Custom decorators
 └── database/            # Seeding and config
 ```
 
